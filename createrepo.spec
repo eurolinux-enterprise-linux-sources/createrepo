@@ -3,7 +3,7 @@
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 26%{?dist}
+Release: 27%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
@@ -30,6 +30,7 @@ Patch33: BZ-1106454-no-compress.patch
 # 6.9
 Patch41: BZ-1174380-fix-update-for-same-nevra.patch
 Patch42: BZ-1297642-cleanup-temporary-files-in-var-tmp-on-exit.patch
+Patch43: BZ-1434369-safety-check-oldData.patch
 
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -72,9 +73,10 @@ from a directory of rpm packages and maintaining it.
 %patch32 -p1
 %patch33 -p1
 
-# 6.8
+# 6.9
 %patch41 -p1
 %patch42 -p1
+%patch43 -p1
 
 %build
 
@@ -102,6 +104,10 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Wed Jun 28 2017 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-27
+- Add safety check for oldData attribute.
+- Resolves: bug#1465915
+
 * Fri Nov 04 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-26
 - Fix temporary files cleanup.
 - Resolves: bug#1297642
