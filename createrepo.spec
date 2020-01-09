@@ -15,12 +15,13 @@ BuildRequires: bash-completion
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 21%{?dist}
+Release: 23%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
 Patch0: createrepo-head.patch
 Patch1: ten-changelog-limit.patch
+Patch2: BZ-1022028-wrong-package-count.patch
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArchitectures: noarch
@@ -36,6 +37,7 @@ packages.
 %setup -q
 %patch0 -p1
 %patch1 -p0
+%patch2 -p1
 
 %build
 
@@ -59,6 +61,13 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Thu Jan 16 2014 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-23
+- Make sure the "packages" attribute is always correct.
+- Resolves: bug#1022028
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.9.9-22
+- Mass rebuild 2013-12-27
+
 * Wed Apr 17 2013 Zdenek Pavlas <zpavlas@redhat.com> - 0.9.9-21
 - update to latest HEAD
 - don't BuildRequire bash-completion in rhel
