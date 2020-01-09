@@ -1,0 +1,12 @@
+diff -up createrepo-0.9.9/docs/modifyrepo.1.orig createrepo-0.9.9/docs/modifyrepo.1
+--- createrepo-0.9.9/docs/modifyrepo.1.orig	2017-03-24 13:57:07.282663747 +0100
++++ createrepo-0.9.9/docs/modifyrepo.1	2017-03-24 13:57:25.116548403 +0100
+@@ -24,7 +24,7 @@ Compress the new repodata before adding
+ Do not compress the new repodata before adding it to the repo.
+ 
+ .IP "\fB\-\-compress-type <compress-type>\fP"
+-Specify which compression type to use: compat (default), xz (may not be available), gz, bz2.
++Specify which compression type to use: gz (default), xz (may not be available), bz2.
+ 
+ .IP "\fB\-s, \-\-checksum <sumtype>\fP"
+ Specify the checksum type to use.

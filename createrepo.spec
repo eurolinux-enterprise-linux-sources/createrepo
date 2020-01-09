@@ -15,7 +15,7 @@ BuildRequires: bash-completion
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 26%{?dist}
+Release: 28%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
@@ -27,6 +27,12 @@ Patch4: BZ-1178763-duplicates.patch
 Patch5: BZ-1270784-checksum-prefix.patch
 Patch6: BZ-1083182-traceback-on-nonexisting-pkglist.patch
 Patch7: BZ-1285761-modifyrepo-mergerepo-options-manpage.patch
+Patch8: BZ-1406418-cleanup-temporary-files-in-var-tmp-on-exit.patch
+Patch9: BZ-1404239-fix-update-for-same-nevra.patch
+Patch10: BZ-1125437-allow-xz-and-bz2-for-xml-files.patch
+Patch11: BZ-1227782-modifyrepo-fix-already-compressed-input.patch
+Patch12: BZ-1287685-modifyrepo-handle-empty-file-lzma.patch
+Patch13: BZ-1287714-modifyrepo-docs-remove-compat.patch
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArchitectures: noarch
@@ -48,6 +54,12 @@ packages.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
 
 
 %build
@@ -72,6 +84,22 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Fri Mar 24 2017 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-28
+- createrepo: allow xz and bz2 for xml files.
+- Resolves: bug#1125437
+- modifyrepo: fix handling of already compressed input.
+- Resolves: bug#1227782
+- modifyrepo: handle empty file with LZMA.
+- Resolves: bug#1287685
+- modifyrepo: docs: remove compat compress type.
+- Resolves: bug#1287714
+
+* Thu Mar 02 2017 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-27
+- Fix temporary files cleanup.
+- Resolves: bug#1406418
+- Fix --update for pkgs with same nevra.
+- Resolves: bug#1404239
+
 * Mon Feb 29 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-26
 - Make sure filename doesn't already contain a checksum.
 - Resolves: bug#1270784

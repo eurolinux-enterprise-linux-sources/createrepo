@@ -1,0 +1,24 @@
+commit c626c54074b36edb090254fe6f4985bc20893436
+Author: Michal Domonkos <mdomonko@redhat.com>
+Date:   Thu Mar 23 16:05:16 2017 +0100
+
+    modifyrepo: handle empty file with LZMA. BZ 1287685
+    
+    When trying to compress an empty string with LZMA, we will get the
+    unfriendly "LZMA.error: unknown error!".  Let's handle this case
+    ourselves and raise a more user-friendly error instead.
+
+diff --git a/modifyrepo.py b/modifyrepo.py
+index 34b0902..ade5607 100755
+--- a/modifyrepo.py
++++ b/modifyrepo.py
+@@ -125,6 +125,9 @@ class RepoMetadata:
+         else:
+             raise MDError, 'invalid metadata type'
+ 
++        if not md and self.compress_type == 'xz':
++            raise MDError, 'LZMA does not support compressing empty files'
++
+         ## Compress the metadata and move it into the repodata
+         mdtype = self._get_mdtype(mdname, mdtype)
+         destmd = os.path.join(self.repodir, mdname)

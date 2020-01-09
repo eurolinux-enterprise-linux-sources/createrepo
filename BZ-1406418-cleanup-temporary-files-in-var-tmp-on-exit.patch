@@ -1,0 +1,106 @@
+diff -up createrepo-0.9.9/createrepo/__init__.py.orig createrepo-0.9.9/createrepo/__init__.py
+--- createrepo-0.9.9/createrepo/__init__.py.orig	2017-02-20 14:53:58.885997101 +0100
++++ createrepo-0.9.9/createrepo/__init__.py	2017-02-20 14:54:06.242935946 +0100
+@@ -1221,19 +1221,19 @@ class MetaDataGenerator:
+                     msg = _('Could not restore old non-metadata file: %s -> %s') % (oldfile, finalfile)
+                     msg += _('Error was %s') % e
+                     raise MDError, msg
++        self._write_out_read_pkgs_list()
++
+ 
++    def cleanup(self):
+         self._cleanup_tmp_repodata_dir()
+-        self._cleanup_update_tmp_dir()        
+-        self._write_out_read_pkgs_list()
++        self._cleanup_update_tmp_dir()
+ 
+ 
+     def _cleanup_update_tmp_dir(self):
+-        if not self.conf.update:
+-            return
+-        
+-        shutil.rmtree(self.oldData._repo.basecachedir, ignore_errors=True)
+-        shutil.rmtree(self.oldData._repo.base_persistdir, ignore_errors=True)
+-        
++        if self.conf.update and hasattr(self, 'oldData'):
++            self.oldData.cleanup()
++
++
+     def _write_out_read_pkgs_list(self):
+         # write out the read_pkgs_list file with self.read_pkgs
+         if self.conf.read_pkgs_list:
+diff -up createrepo-0.9.9/createrepo/merge.py.orig createrepo-0.9.9/createrepo/merge.py
+--- createrepo-0.9.9/createrepo/merge.py.orig	2017-02-20 14:53:58.884997110 +0100
++++ createrepo-0.9.9/createrepo/merge.py	2017-02-20 14:54:06.241935954 +0100
+@@ -146,3 +146,4 @@ class RepoMergeBase:
+         mdgen.doPkgMetadata()
+         mdgen.doRepoMetadata()
+         mdgen.doFinalMove()
++        mdgen.cleanup()
+diff -up createrepo-0.9.9/createrepo/readMetadata.py.orig createrepo-0.9.9/createrepo/readMetadata.py
+--- createrepo-0.9.9/createrepo/readMetadata.py.orig	2017-02-20 14:53:58.877997168 +0100
++++ createrepo-0.9.9/createrepo/readMetadata.py	2017-02-20 14:54:06.241935954 +0100
+@@ -16,6 +16,7 @@
+ # Copyright 2006 Red Hat
+ 
+ import os
++import shutil
+ import stat
+ from utils import errorprint, _
+ 
+@@ -109,7 +110,11 @@ class MetadataIndex(object):
+             return self._repo.sack.searchPkgTuple(pkgtup)[0]
+         return None
+ 
+-    
++    def cleanup(self):
++        """Delete temporary files in /var/tmp."""
++        shutil.rmtree(self._repo.basecachedir, ignore_errors=True)
++        shutil.rmtree(self._repo.base_persistdir, ignore_errors=True)
++
+ 
+ if __name__ == "__main__":
+     cwd = os.getcwd()
+@@ -122,4 +127,5 @@ if __name__ == "__main__":
+         print po.xml_dump_primary_metadata()
+         print po.xml_dump_filelists_metadata()
+         print po.xml_dump_other_metadata()
++    idx.cleanup()
+ 
+diff -up createrepo-0.9.9/genpkgmetadata.py.orig createrepo-0.9.9/genpkgmetadata.py
+--- createrepo-0.9.9/genpkgmetadata.py.orig	2017-02-20 14:53:58.889997068 +0100
++++ createrepo-0.9.9/genpkgmetadata.py	2017-02-20 14:54:06.241935954 +0100
+@@ -249,6 +249,7 @@ def main(args):
+         print ('start time: %0.3f' % (time.time() - start_st))
+ 
+     mid_st = time.time()
++    mdgen = None
+     try:
+         if conf.split:
+             mdgen = createrepo.SplitMetaDataGenerator(config_obj=conf,
+@@ -277,12 +278,25 @@ def main(args):
+         mdgen.doFinalMove()
+         if conf.profile:
+             print ('fm time: %0.3f' % (time.time() - fm_st))
++        cl_st = time.time()
++        mdgen.cleanup()
++        if conf.profile:
++            print ('cl time: %0.3f' % (time.time() - cl_st))
+ 
+ 
+     except MDError, errormsg:
+         errorprint(_('%s') % errormsg)
++        # cleanup
++        tmp = os.path.join(conf.outputdir, conf.tempdir)
++        if os.path.exists(tmp):
++            for name in os.listdir(tmp):
++                os.unlink(os.path.join(tmp, name))
++            os.rmdir(tmp)
+         sys.exit(1)
+ 
++    finally:
++        if mdgen:
++            mdgen.cleanup()
+ 
+ if __name__ == "__main__":
+     if len(sys.argv) > 1:
