@@ -1,0 +1,38 @@
+diff -up createrepo-0.9.9/createrepo/merge.py.old createrepo-0.9.9/createrepo/merge.py
+--- createrepo-0.9.9/createrepo/merge.py.old	2015-12-08 11:08:51.998837759 +0100
++++ createrepo-0.9.9/createrepo/merge.py	2015-12-08 11:09:58.868951847 +0100
+@@ -70,9 +70,7 @@ class RepoMergeBase:
+ 
+         for repo in repos:
+             for pkg in repo.sack:
+-                others = self.yumbase.pkgSack.searchNevra(name=pkg.name, arch=pkg.arch)
+-                # NOTE the above is definitely going to catch other versions which may
+-                # be an invalid comparison
++                others = self.yumbase.pkgSack.searchNevra(pkg.name, pkg.epoch, pkg.version, pkg.release, pkg.arch)
+                 if len(others) > 1:
+                     for thatpkg in others:
+                         if pkg.repoid == thatpkg.repoid: continue
+commit b8904f59773a478aedd416963ec451c678a6bb72
+Author: Zdenek Pavlas <zpavlas@redhat.com>
+Date:   Wed Jan 29 09:53:37 2014 +0100
+
+    Support API users that set pkglist=<package sack>. BZ 1058975
+    
+    Commit 84a237f6a2e661879147e1ee5f9a2be984267991
+    broke this use case. Make it work again.
+
+diff --git a/createrepo/__init__.py b/createrepo/__init__.py
+index b1875f6..85f2a3d 100644
+--- a/createrepo/__init__.py
++++ b/createrepo/__init__.py
+@@ -400,7 +400,9 @@ class MetaDataGenerator:
+         if self.conf.update:
+             self._setup_old_metadata_lookup()
+         # rpms we're going to be dealing with
+-        if self.conf.pkglist:
++        if isinstance(self.conf.pkglist, MetaSack):
++            packages = self.conf.pkglist
++        elif self.conf.pkglist:
+             packages = []
+             for pkg in self.conf.pkglist:
+                 if '://' in pkg: # remote

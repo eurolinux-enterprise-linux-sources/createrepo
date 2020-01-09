@@ -15,13 +15,15 @@ BuildRequires: bash-completion
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 23%{?dist}
+Release: 25%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
 Patch0: createrepo-head.patch
 Patch1: ten-changelog-limit.patch
 Patch2: BZ-1022028-wrong-package-count.patch
+Patch3: BZ-1256216-cifs-share-oserror.patch
+Patch4: BZ-1178763-duplicates.patch
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArchitectures: noarch
@@ -38,6 +40,9 @@ packages.
 %patch0 -p1
 %patch1 -p0
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+
 
 %build
 
@@ -61,6 +66,16 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Wed Dec 10 2015 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-25
+- mergerepo: fix getattr() crash.
+- Related: bug#1178763
+
+* Tue Dec 08 2015 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-24
+- mergerepo: merge package versions from multiple repos.
+- Related: bug#1178763
+- Close lock file before unlink().
+- Related: bug#1256216
+
 * Thu Jan 16 2014 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-23
 - Make sure the "packages" attribute is always correct.
 - Resolves: bug#1022028
