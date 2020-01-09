@@ -3,7 +3,7 @@
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 24%{?dist}
+Release: 26%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
@@ -26,6 +26,10 @@ Patch24: BZ-1093713-modifyrepo-mergerepo-options-manpage.patch
 Patch31: BZ-1175925-mergerepo-package-versions.patch
 Patch32: BZ-1104840-checksum-prefix.patch
 Patch33: BZ-1106454-no-compress.patch 
+
+# 6.9
+Patch41: BZ-1174380-fix-update-for-same-nevra.patch
+Patch42: BZ-1297642-cleanup-temporary-files-in-var-tmp-on-exit.patch
 
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -68,6 +72,10 @@ from a directory of rpm packages and maintaining it.
 %patch32 -p1
 %patch33 -p1
 
+# 6.8
+%patch41 -p1
+%patch42 -p1
+
 %build
 
 %install
@@ -94,6 +102,14 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Fri Nov 04 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-26
+- Fix temporary files cleanup.
+- Resolves: bug#1297642
+
+* Mon Oct 31 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-25
+- Fix --update for pkgs with same nevra.
+- Resolves: bug#1174380
+
 * Tue Jan 05 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-24
 - Make sure filename doesn't already contain a checksum.
 - Resolves: bug#1104840
