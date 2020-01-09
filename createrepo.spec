@@ -15,7 +15,7 @@ BuildRequires: bash-completion
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 25%{?dist}
+Release: 26%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
@@ -24,6 +24,9 @@ Patch1: ten-changelog-limit.patch
 Patch2: BZ-1022028-wrong-package-count.patch
 Patch3: BZ-1256216-cifs-share-oserror.patch
 Patch4: BZ-1178763-duplicates.patch
+Patch5: BZ-1270784-checksum-prefix.patch
+Patch6: BZ-1083182-traceback-on-nonexisting-pkglist.patch
+Patch7: BZ-1285761-modifyrepo-mergerepo-options-manpage.patch
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArchitectures: noarch
@@ -42,6 +45,9 @@ packages.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
 
 
 %build
@@ -66,6 +72,14 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Mon Feb 29 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-26
+- Make sure filename doesn't already contain a checksum.
+- Resolves: bug#1270784
+- Catch IOErrors when loading pkglist.
+- Resolves: bug#1083182
+- Add missing options to the manpage.
+- Resolves: bug#1285761
+
 * Wed Dec 10 2015 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-25
 - mergerepo: fix getattr() crash.
 - Related: bug#1178763
