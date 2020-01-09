@@ -3,7 +3,7 @@
 Summary: Creates a common metadata repository
 Name: createrepo
 Version: 0.9.9
-Release: 22%{?dist}
+Release: 24%{?dist}
 License: GPLv2
 Group: System Environment/Base
 Source: %{name}-%{version}.tar.gz
@@ -21,6 +21,11 @@ Patch21: BZ-952602-modifyrepo-options.patch
 Patch22: BZ-1083185-traceback-on-nonexisting-pkglist.patch
 Patch23: BZ-1035588-cifs-share-oserror.patch
 Patch24: BZ-1093713-modifyrepo-mergerepo-options-manpage.patch
+
+# 6.8
+Patch31: BZ-1175925-mergerepo-package-versions.patch
+Patch32: BZ-1104840-checksum-prefix.patch
+Patch33: BZ-1106454-no-compress.patch 
 
 URL: http://createrepo.baseurl.org/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -58,6 +63,11 @@ from a directory of rpm packages and maintaining it.
 %patch23 -p1
 %patch24 -p1
 
+# 6.8
+%patch31 -p1
+%patch32 -p1
+%patch33 -p1
+
 %build
 
 %install
@@ -84,6 +94,16 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/createrepo
 
 %changelog
+* Tue Jan 05 2016 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-24
+- Make sure filename doesn't already contain a checksum.
+- Resolves: bug#1104840
+- Remove nonexistent --no-compress option from the manpage.
+- Resolves: bug#1106454
+
+* Mon Dec 14 2015 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-23
+- mergerepo: merge package versions from multiple repos.
+- Resolves: bug#1175925
+
 * Tue May 6 2014 Valentina Mukhamedzhanova <vmukhame@redhat.com> - 0.9.9-22
 - Add modifyrepo and mergrepo options to their manpages.
 - Resolves: rhbz#1093713
